@@ -1,39 +1,33 @@
-import { createContext, useContext, useState } from "react";
-
-// Sample data (could come from API later)
-const initialGuests = [
-  {
-    id: 1,
-    name: "Alice Johnson",
-    email: "alice@example.com",
-    phone: "123-456-7890",
-    bio: "Loves events and meeting new people.",
-    job: "Event Planner",
-  },
-  {
-    id: 2,
-    name: "Bob Smith",
-    email: "bob@example.com",
-    phone: "987-654-3210",
-    bio: "Coffee enthusiast and avid hiker.",
-    job: "Software Engineer",
-  },
-];
+import { createContext } from "react";
+import { useContext } from "react";
+import { useEffect } from "react";
+import { useState } from "react";
 
 const GuestContext = createContext(null);
 
 export function GuestProvider({ children }) {
-  const [guests, setGuests] = useState(initialGuests);
+  const [guests, setGuests] = useState([]);
   const [selectedGuest, setSelectedGuest] = useState(null);
+
+  useEffect(() => {
+    const fetchGuests = async () => {
+      try {
+        const response = await fetch(
+          "https://fsa-crud-2aa9294fe819.herokuapp.com/api/2505-ftb-et-web-ft/guests"
+        );
+        const data = await response.json();
+        setGuests(data.data);
+      } catch (error) {
+        console.error("Failed to fetch guests:", error);
+      }
+    };
+
+    fetchGuests();
+  }, []);
 
   return (
     <GuestContext.Provider
-      value={{
-        guests,
-        setGuests,
-        selectedGuest,
-        setSelectedGuest,
-      }}
+      value={{ guests, setGuests, selectedGuest, setSelectedGuest }}
     >
       {children}
     </GuestContext.Provider>
